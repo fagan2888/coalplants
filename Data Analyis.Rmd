@@ -1,0 +1,57 @@
+---
+title: "Sales Analysis"
+output: html_document
+---
+```{r}
+install.packages("ggmap")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(ggmap)
+```
+
+Importing Sales Data from Madison Assessor's office
+```{r}
+sales<-read.csv("~/Documents/Berkeley/Senior Research Project/Coal Power Plants/SalesFrom2001.csv")
+```
+
+Cleaning (adding in a date column)
+Assumes each sale is on the first of the month :(
+
+```{r}
+sales<-sales%>%
+  filter(Sales.Price>0)%>%
+  mutate(date=make_date(year=Sale.Year, month=Sale.Month))
+sales
+```
+
+A quick and nonhelpful chart
+```{r}
+sales%>%
+  filter(Sales.Price<10000000)%>%
+  filter(Zip.Code%in%c(53703,53715))%>%
+  ggplot()+geom_point(mapping=aes(x=date , y=Sales.Price))
+```
+
+Reading in Consumer Price Index Data
+U.S. Bureau of Labor Statistics, Consumer Price Index for All Urban Consumers: All Items [CPIAUCSL], retrieved from FRED, Federal Reserve Bank of St. Louis; https://fred.stlouisfed.org/series/CPIAUCSL, October 25, 2018.
+```{r}
+CPI<-read.csv("CPIAUCSL.csv")
+CPI
+```
+
+Converting sales to June 2018 dollars
+```{r}
+
+```
+
+Getting Lat/long for each street address
+```{r}
+
+```
+
