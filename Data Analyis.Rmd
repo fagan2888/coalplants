@@ -17,32 +17,40 @@ library(ggmap)
 
 Importing Sales Data from Madison Assessor's office
 ```{r}
-sales<-read.csv("~/Documents/Berkeley/Senior Research Project/Coal Power Plants/SalesFrom2001.csv")
+sales <- read_csv("~/Documents/Berkeley/Senior Research Project/Coal Plants/SalesFrom2001.csv")
+sales
 ```
 
 Cleaning (adding in a date column)
-Assumes each sale is on the first of the month :(
+Assumes each sale is on the first of the month :
 
 ```{r}
-sales<-sales%>%
-  filter(Sales.Price>0)%>%
-  mutate(date=make_date(year=Sale.Year, month=Sale.Month))
-sales
+cleansales<-sales%>%
+  rowwise()%>%
+  mutate(saleprice=as.numeric(`Sales Price`))%>%
+  mutate(date=make_date(year=`Sale Year`, month=`Sale Month`))%>%
+  filter(saleprice>0)%>%
+  filter(saleprice<9000000)
+cleansales
 ```
 
 A quick and nonhelpful chart
 ```{r}
-sales%>%
-  filter(Sales.Price<10000000)%>%
-  filter(Zip.Code%in%c(53703,53715))%>%
-  ggplot()+geom_point(mapping=aes(x=date , y=Sales.Price))
+cleansales%>%
+  group_by(date)%>%
+  summarize(median_price=median(saleprice))%>%
+  left_join(CPI, by= date)
+  #ggplot()+geom_point(mapping=aes(x=date , y=median_price))
 ```
 
 Reading in Consumer Price Index Data
 U.S. Bureau of Labor Statistics, Consumer Price Index for All Urban Consumers: All Items [CPIAUCSL], retrieved from FRED, Federal Reserve Bank of St. Louis; https://fred.stlouisfed.org/series/CPIAUCSL, October 25, 2018.
+
+Price index in September 2018 is 251.994
 ```{r}
 CPI<-read.csv("CPIAUCSL.csv")
-CPI
+CPI%>%
+  mutate
 ```
 
 Converting sales to June 2018 dollars
